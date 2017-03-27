@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <title>查找变位词2</title>
+  <script type="text/javascript">
+     var array_str;   //保存字符串的数组
+	 var array_sign;  //保存签名的数组
+
+     //初始化字符串
+	 function data_init(){
+		 var reg = /^[1-9][0-9]*$/;
+		 var num=document.getElementById("text_num").value;
+		 if(!reg.test(num)){
+			 alert("生成数量必须是大于零的数字！");
+			 return false;
+		 }
+
+         array_str=new Array(num);
+		 array_sign=new Array(num);
+
+		 var start=new Date().getTime();
+         for(var i=0;i<num;i++){
+            array_str[i]=create_str();
+		 }
+    	 var end=new Date().getTime();
+ 		 alert("初始化运行了" +(end-start)+"毫秒");
+        
+         var htmlstr="";
+         for (var x in array_str)
+         {
+             htmlstr+=array_str[x]  + "<br>";
+         }
+		 document.getElementById("div_stock").innerHTML="字符串<br>" +htmlstr; 
+	 }
+
+	 //生成由任意小写字母组成的，长度不超过10位的随机字符串
+	 function create_str(){
+		 var str="";
+		 var len=0;  //字符串长度
+		 var letter_charcode=0;   //字母的ascii码
+		 var letter="";
+		 len=Math.ceil(Math.random()*10);  //获得字符串长度，1到10之间的随机数
+		 for(var i=0;i<len;i++){
+            letter_charcode=Math.ceil(Math.random()*26)+96;   //获得97到122之间的随机数，小写字母a到z的ascii码
+			letter=String.fromCharCode(letter_charcode);    //将ascii码转成字母
+            str +=letter;
+		 }
+		 return str;
+	 }
+
+     //生成签名，将字符串中的字母由小到大排序,采用冒泡排序法
+	  function get_sign(str){
+		  var sign="";
+		  var data=str.split("");
+          var z="";
+		  for(var j=data.length;j>0;j--){
+			  for(var i=1;i<j;i++){
+				  if(data[i]<data[i-1]){
+				     z = data[i];
+                     data[i] = data[i - 1];
+                     data[i - 1] = z;
+				  }
+			  }
+		  }
+          for(var x in data){
+			  sign+=data[x];
+		  }
+		  return sign;
+	  }
+
+     //查找
+	 function search(){
+		 var str=document.getElementById("text_str").value;
+		 if(str.length==0){
+			 alert("请输入查找的字符串");
+			 return false;
+		 }
+		 var mathstr="";
+		 var start=new Date().getTime();
+		 for(var x in array_str){
+			 //如果两个词互为变位词，那么这两个词的长度和各字母的asciicode之和必须相同
+            if(str.length==array_str[x].length && get_asciicode_total(str)==get_asciicode_total(array_str[x])){
+                 if(get_sign(str)==get_sign(array_str[x])){
+                     mathstr+=mathstr.length==0?array_str[x]:","+array_str[x];
+				 }
+		   }
+		 }
+		 var end=new Date().getTime();
+  		 alert("查找运行了" +(end-start)+"毫秒");
+		 if(mathstr.length==0){
+			 alert("未找到变位词！");
+		 }
+		 else{
+			 alert(" 找到的变位词："  +mathstr);
+		 } 
+	 }
+
+	 //获得字符串的ascii码之和
+	 function get_asciicode_total(str){
+         var data=str.split("");
+		 var i=0;
+		 for(var x in data){
+			 i+=data[x].charCodeAt();
+		 }
+		 return i;
+	 }
+  </script>
+ </head>
+
+ <body>
+  生成数量：<input id="text_num" type="text" name="" style="width:50px"> <input type="button" value="开始生成" onclick="data_init()">
+  查找变位词:<input id="text_str" type="text" name=""> <input type="button" value="开始查找" onclick="search()">
+  <div id="div_stock"></div>
+ </body>
+</html>
